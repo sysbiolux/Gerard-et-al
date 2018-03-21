@@ -435,3 +435,693 @@ DEGAll.Osteo.FCThr.abs1DOWN = DEGAll.Osteo.FCThr[apply(DEGAll.Osteo.FCThr[, -1],
 write_delim(DEGAll.Osteo.FCThr.abs1DOWN, "./DEG/27032017-Ob-DEGatAnyTP-FDR0.05-DOWNFClin2.txt", delim = "\t", col_names = TRUE)
 
 head(DEGAll.Osteo.FCThr.abs1DOWN)
+
+## Plot time-series profile of Ahr, Glis1, Cxcl12, Notch1, Notch2, Notch3, Notch4
+
+Ahr = "ENSMUSG00000019256"
+Notch1 = "ENSMUSG00000026923"
+Notch2 = "ENSMUSG00000027878"
+Notch3 = "ENSMUSG00000038146"
+Notch4 = "ENSMUSG00000015468"
+Cxcl12 = "ENSMUSG00000061353"
+Glis1 = "ENSMUSG00000034762"
+
+# Retrieve the normalized counts for Ahr #
+AhrCounts = plotCounts(ddsTC2, gene = Ahr, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+AhrCounts$SampleID = factor(AhrCounts$SampleID, levels = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15",
+                                                           "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+# Retrieve the normalized counts for Glis1 #
+Glis1Counts = plotCounts(ddsTC2, gene = Glis1, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+Glis1Counts$SampleID = factor(Glis1Counts$SampleID, levels = c("ST2-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15",
+                                                               "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+# Retrieve the normalized counts for Notch1 #
+Notch1Counts = plotCounts(ddsTC2, gene = Notch1, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+Notch1Counts$SampleID = factor(Notch1Counts$SampleID, levels = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15", 
+                                                                 "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+# Retrieve the normalized counts for Notch2 #
+Notch2Counts = plotCounts(ddsTC2, gene = Notch2, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+Notch2Counts$SampleID = factor(Notch2Counts$SampleID, levels = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15", 
+                                                                 "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+# Retrieve the normalized counts for Notch3 #
+Notch3Counts = plotCounts(ddsTC2, gene = Notch3, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+Notch3Counts$SampleID = factor(Notch3Counts$SampleID, levels = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15", 
+                                                                 "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+# Retrieve the normalized counts for Notch4 #
+Notch4Counts = plotCounts(ddsTC2, gene = Notch4, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+Notch4Counts$SampleID = factor(Notch4Counts$SampleID, levels = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15", 
+                                                                 "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+# Retrieve the normalized counts for Cxcl12 #
+Cxcl12Counts = plotCounts(ddsTC2, gene = Cxcl12, intgroup = c("SampleID", "Cell"), returnData = TRUE)
+Cxcl12Counts$SampleID = factor(Cxcl12Counts$SampleID, levels = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15", 
+                                                                 "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"))
+
+## Cxcl12 plot (mRNA and SE) only for Ad for Fig4 in the paper##
+# library(scales) 
+# show_col(hue_pal()(8))  ## Apply the same color at the line and the data points
+Cxcl12Counts.Ad = Cxcl12Counts[c(1:18),] ## Select only the count for adipo
+rel = "Msc-D0"
+Cxcl12Counts.Ad.rel = Cxcl12Counts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Cxcl12 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Cxcl12SE = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapAdipoMERGEDFinCounts.txt", 
+                      delim = "\t") ## Load the count for the meta SE
+
+AdipoSENm = c("SE_ID", "Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")
+colnames(Cxcl12SE) = AdipoSENm
+Cxcl12SE.SE921 = filter(Cxcl12SE, SE_ID == "SE-921") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame()## Take only the counts for SE-921 which targets Cxcl12
+
+head(Cxcl12SE.SE921)
+
+Cxcl12SE.rel = Cxcl12SE.SE921 %>% 
+  mutate(countRel.SE = `SE-921`/`SE-921`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")) %>%
+  mutate(type.SE = "merged SE") %>%
+  as.data.frame()
+
+# Load the Pearson correaltion for SE-921 and Cxcl12
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/10042017-PearsonCor-Cxcl12-SE921.RData")
+Cxcl12_SE.921
+Cxcl12_Plot_Ad = ggplot(Cxcl12Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = Cxcl12Counts.Ad.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Cxcl12 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  geom_point(data = Cxcl12SE.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#FF6666", size = 5, shape = 17) +
+  geom_smooth(data = Cxcl12SE.rel, aes(x = SampleID, y = countRel.SE, linetype = "merged SE"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") +
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("solid", "dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 1.5)
+
+Cxcl12_Plot_Ad = Cxcl12_Plot_Ad + 
+  geom_text(x = 5.5, y = 1.5, label = paste0("r = ", round(Cxcl12_SE.921, digits = 2)), color = "black", size = 10)
+
+print(Cxcl12_Plot_Ad)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/12042017-Cxcl12-Ad-Fig3B.pdf", width = 8, height = 8)
+Cxcl12_Plot_Ad
+dev.off()
+
+## Cxcl12 plot (mRNA and SE) only for Ob for Fig3 in the paper##
+## Apply the same color at the line and the data points
+Cxcl12Counts.Ob = Cxcl12Counts[c(1:3, 19:33),] ## Select only the count for adipo
+rel.Ob = "Msc-D0"
+Cxcl12Counts.Ob.rel = Cxcl12Counts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel.Ob]) %>% 
+  mutate(type = "Cxcl12 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Cxcl12SE.Ob = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapOsteoMERGEDFinCounts.txt", 
+                         delim = "\t") ## Load the count for the meta SE
+
+OsteoSENm = c("SE_ID", "Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15")
+colnames(Cxcl12SE.Ob) = OsteoSENm
+Cxcl12SE.Ob.SE921 = filter(Cxcl12SE.Ob, SE_ID == "SE-921") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame()## Take only the counts for SE-889 which targets Cxcl12
+
+head(Cxcl12SE.Ob.SE921)
+
+Cxcl12SE.Ob.rel = Cxcl12SE.Ob.SE921 %>% 
+  mutate(countRel.SE = `SE-921`/`SE-921`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15")) %>%
+  mutate(type.SE = "merged SE") %>%
+  as.data.frame()
+
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/10042017-PearsonCor-Cxcl12-SE921.Ob.RData")
+Cxcl12_Ob_SE.921
+Cxcl12_Plot_Ob = ggplot(Cxcl12Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = Cxcl12Counts.Ob.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Cxcl12 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  geom_point(data = Cxcl12SE.Ob.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#0066CC", size = 5, shape = 17) +
+  geom_smooth(data = Cxcl12SE.Ob.rel, aes(x = SampleID, y = countRel.SE, linetype = "merged SE"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") +
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells",
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("solid", "dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 1.5)
+
+Cxcl12_Plot_Ob = Cxcl12_Plot_Ob +
+  geom_text(x = 5.5, y = 1.5, label = paste0("r = ", round(Cxcl12_Ob_SE.921, digits = 2)), color = "black", size = 10)
+
+print(Cxcl12_Plot_Ob)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/12042017-Cxcl12-Ob-Fig3B.pdf", width = 8, height = 8)
+Cxcl12_Plot_Ob
+dev.off()
+
+#################################### Ahr figure 4 - se and mRNA plot - Adipo ############################################
+## Ahr plot (mRNA and SE) only for Ad for Fig4 in the paper##
+
+AhrCounts.Ad = AhrCounts[c(1:18),] ## Select only the count for adipo
+rel = "Msc-D0"
+AhrCounts.Ad.rel = AhrCounts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Ahr mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+AhrSE = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapAdipoMERGEDFinCounts.txt", 
+                   delim = "\t") ## Load the count for the meta SE
+
+AdipoSENm = c("SE_ID", "Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")
+colnames(AhrSE) = AdipoSENm
+
+
+AhrSE.SE283 = filter(AhrSE, SE_ID == "SE-283") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-283 which targets Ahr
+
+AhrSE.SE284 = filter(AhrSE, SE_ID == "SE-284") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-284 which targets Ahr
+
+AhrSE.SE285 = filter(AhrSE, SE_ID == "SE-285") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-285 which targets Ahr
+
+AhrSE.SE286 = filter(AhrSE, SE_ID == "SE-286") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-286 which targets Ahr
+
+## Load the Pearson correlation between Ahr mRNA and their SEs ##
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE283.RData")
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE284.RData")
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE285.RData")
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE286.RData")
+Ahr_SE.283
+Ahr_SE.284
+Ahr_SE.285
+Ahr_SE.286
+
+AhrSE.283.rel = AhrSE.SE283 %>% 
+  mutate(countRel.SE = `SE-283`/`SE-283`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")) %>%
+  mutate(type.SE = paste("SE-283 | r =", round(Ahr_SE.283, digits = 2))) %>%
+  as.data.frame()
+
+AhrSE.284.rel = AhrSE.SE284 %>% 
+  mutate(countRel.SE = `SE-284`/`SE-284`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")) %>%
+  mutate(type.SE = paste("SE-284 | r =", round(Ahr_SE.284, digits = 2))) %>%
+  as.data.frame()
+
+AhrSE.285.rel = AhrSE.SE285 %>% 
+  mutate(countRel.SE = `SE-285`/`SE-285`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")) %>%
+  mutate(type.SE = paste("SE-285 | r =", round(Ahr_SE.285, digits = 2))) %>%
+  as.data.frame()
+
+AhrSE.286.rel = AhrSE.SE286 %>% 
+  mutate(countRel.SE = `SE-286`/`SE-286`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")) %>%
+  mutate(type.SE = paste("SE-286 | r =", round(Ahr_SE.286, digits = 2))) %>%
+  as.data.frame()
+
+## Plotting
+
+Ahr_SE_Plot_Ad = ggplot(AhrCounts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = AhrCounts.Ad.rel, aes(x = SampleID, y = countRel,
+                                           linetype = "Ahr mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  geom_point(data = AhrSE.283.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#FF6666", size = 5, 
+             shape = 15) +
+  geom_point(data = AhrSE.284.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#FF6666", size = 5, 
+             shape = 16) +
+  geom_point(data = AhrSE.285.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#FF6666", size = 5, 
+             shape = 17) +
+  geom_point(data = AhrSE.286.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#FF6666", size = 5, 
+             shape = 19) +
+  geom_smooth(data = AhrSE.283.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-283 | r = 0.99"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  geom_smooth(data = AhrSE.284.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-284 | r = 0.98"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") +
+  geom_smooth(data = AhrSE.285.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-285 | r = 0.98"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") +
+  geom_smooth(data = AhrSE.286.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-286 | r = 0.99"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") +
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
+  scale_linetype_manual(name = "", values = c("solid", "dashed", "dotted", "dotdash", "longdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 1.5)
+
+print(Ahr_SE_Plot_Ad)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/12042017-Ahr-Ad-SE-Fig4B.pdf", width = 8, height = 8)
+Ahr_SE_Plot_Ad
+dev.off()
+
+#################################### Ahr figure 4 - se and mRNA plot - Osteo ############################################
+## Ahr plot (mRNA and SE) only for Ad for Fig3 in the paper##
+
+AhrCounts.Ob = AhrCounts[c(1:3, 19:33),] ## Select only the count for adipo
+rel = "Msc-D0"
+AhrCounts.Ob.rel = AhrCounts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Ahr mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+AhrSE = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapOsteoMERGEDFinCounts.txt", 
+                   delim = "\t") ## Load the count for the meta SE
+
+OsteoSENm = c("SE_ID", "Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "A-D15")
+colnames(AhrSE) = OsteoSENm
+
+
+AhrSE.Ob.SE283 = filter(AhrSE, SE_ID == "SE-283") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-283 which targets Ahr
+
+AhrSE.Ob.SE284 = filter(AhrSE, SE_ID == "SE-284") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-284 which targets Ahr
+
+AhrSE.Ob.SE285 = filter(AhrSE, SE_ID == "SE-285") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-285 which targets Ahr
+
+AhrSE.Ob.SE286 = filter(AhrSE, SE_ID == "SE-286") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-286 which targets Ahr
+
+## Load the Pearson correlation between Ahr mRNA and their SEs ##
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE283.RData")
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE284.RData")
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE285.RData")
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE286.RData")
+Ahr_Ob_SE.283
+Ahr_Ob_SE.284
+Ahr_Ob_SE.285
+Ahr_Ob_SE.286
+
+AhrSE.Ob.283.rel = AhrSE.Ob.SE283 %>% 
+  mutate(countRel.SE = `SE-283`/`SE-283`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9","O-D15")) %>%
+  mutate(type.SE = paste("SE-283 | r =", round(Ahr_Ob_SE.283, digits = 2))) %>%
+  as.data.frame()
+
+AhrSE.Ob.284.rel = AhrSE.Ob.SE284 %>% 
+  mutate(countRel.SE = `SE-284`/`SE-284`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9","O-D15")) %>%
+  mutate(type.SE = paste("SE-284 | r =", round(Ahr_Ob_SE.284, digits = 2))) %>%
+  as.data.frame()
+
+AhrSE.Ob.285.rel = AhrSE.Ob.SE285 %>% 
+  mutate(countRel.SE = `SE-285`/`SE-285`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9","O-D15")) %>%
+  mutate(type.SE = paste("SE-285 | r =", round(Ahr_Ob_SE.285, digits = 2))) %>%
+  as.data.frame()
+
+AhrSE.Ob.286.rel = AhrSE.Ob.SE286 %>% 
+  mutate(countRel.SE = `SE-286`/`SE-286`[1]) %>%
+  mutate(SampleID = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9","O-D15")) %>%
+  mutate(type.SE = paste("SE-286 | r =", round(Ahr_Ob_SE.286, digits = 2))) %>%
+  as.data.frame()
+
+## Plotting
+
+Ahr_SE_Plot_Ob = ggplot(AhrCounts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = AhrCounts.Ob.rel, aes(x = SampleID, y = countRel,
+                                           linetype = "Ahr mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  geom_point(data = AhrSE.Ob.283.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#0066CC", size = 5, 
+             shape = 15) +
+  geom_point(data = AhrSE.Ob.284.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#0066CC", size = 5, 
+             shape = 16) +
+  geom_point(data = AhrSE.Ob.285.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#0066CC", size = 5, 
+             shape = 17) +
+  geom_point(data = AhrSE.Ob.286.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#0066CC", size = 5, 
+             shape = 19) +
+  geom_smooth(data = AhrSE.Ob.283.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-283 | r = 0.98"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  geom_smooth(data = AhrSE.Ob.284.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-284 | r = 0.96"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") +
+  geom_smooth(data = AhrSE.Ob.285.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-285 | r = 0.98"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") +
+  geom_smooth(data = AhrSE.Ob.286.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-286 | r = 0.95"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") +
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
+  scale_linetype_manual(name = "", values = c("solid", "dashed", "dotted", "dotdash", "longdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 1.5)
+
+print(Ahr_SE_Plot_Ob)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/12042017-Ahr-Ob-SE-Fig4B.pdf", width = 8, height = 8)
+Ahr_SE_Plot_Ob
+dev.off()
+
+#################################### Glis1 figure 4 - se and mRNA plot - Adipo ############################################
+## Glis1 plot (mRNA and SE) only for Ad for Fig4 in the paper##
+
+Glis1Counts.Ad = Glis1Counts[c(1:18),] ## Select only the count for adipo
+rel = "ST2-D0"
+Glis1Counts.Ad.rel = Glis1Counts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Glis1 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Glis1SE = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapAdipoMERGEDFinCounts.txt", 
+                     delim = "\t") ## Load the count for the meta SE
+
+AdipoSENm = c("SE_ID", "Msc-D0", "A-D1", "A-D3", "A-D5", "A-D15")
+colnames(Glis1SE) = AdipoSENm
+
+
+Glis1SE.SE831 = filter(Glis1SE, SE_ID == "SE-831") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-831 which targets Glis1
+
+## Load the Pearson correlation between Glis1 mRNA and its SE ##
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/02022018-PearsonCor-Glis1-SE831.RData")
+
+Glis1_SE.831
+
+Glis1SE.831.rel = Glis1SE.SE831 %>% 
+  mutate(countRel.SE = `SE-831`/`SE-831`[1]) %>%
+  mutate(SampleID = c("ST2-D0", "A-D1", "A-D3", "A-D5", "A-D15")) %>%
+  mutate(type.SE = paste("SE-831 | r =", round(Glis1_SE.831, digits = 2))) %>%
+  as.data.frame()
+
+## Plot together Glis1 mRNA (normalized count) and its SE
+
+Glis1_SE_Plot_Ad = ggplot(Glis1Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = Glis1Counts.Ad.rel, aes(x = SampleID, y = countRel,
+                                             linetype = "Glis1 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  geom_point(data = Glis1SE.831.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#FF6666", size = 5, 
+             shape = 15) +
+  geom_smooth(data = Glis1SE.831.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-831 | r = 0.99"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 30, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 30, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 30),
+        axis.title.y = element_text(face = "bold", size = 30),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 30, face = "bold"),
+        plot.title = element_text(face = "bold", size = 30, hjust = 0.5)) +
+  scale_linetype_manual(name = "", values = c("solid", "dotted")) +
+  
+  scale_x_discrete(breaks = c("ST2-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 1.5)
+
+print(Glis1_SE_Plot_Ad)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/Figures/Figure6/15032018-Glis1-Ad-SE-Fig6C-biggerFont.pdf", width = 10, height = 10)
+Glis1_SE_Plot_Ad
+dev.off()
+
+#################################### Glis1 figure 4 - se and mRNA plot - Osteo ############################################
+## Glis1 plot (mRNA and SE) only for Ob for Fig4 in the paper##
+
+Glis1Counts.Ob = Glis1Counts[c(1:3, 19:33),] ## Select only the count for osteo
+rel = "ST2-D0"
+Glis1Counts.Ob.rel = Glis1Counts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Glis1 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Glis1SE = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapOsteoMERGEDFinCounts.txt", 
+                     delim = "\t") ## Load the count for the meta SE
+
+OsteoSENm = c("SE_ID", "Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "A-D15")
+colnames(Glis1SE) = OsteoSENm
+
+
+Glis1SE.Ob.SE831 = filter(Glis1SE, SE_ID == "SE-831") %>%
+  column_to_rownames("SE_ID") %>%
+  t() %>%
+  as_data_frame() %>% 
+  head()  ## Take only the counts for SE-831 which targets Glis1
+
+
+## Load the Pearson correlation between Ahr mRNA and their SEs ##
+load("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/02022018-PearsonCor-Glis1-Ob-SE831.RData")
+
+Glis1_SE.831_Ob
+
+Glis1SE.Ob.831.rel = Glis1SE.Ob.SE831 %>% 
+  mutate(countRel.SE = `SE-831`/`SE-831`[1]) %>%
+  mutate(SampleID = c("ST2-D0", "O-D1", "O-D3", "O-D5", "O-D9","O-D15")) %>%
+  mutate(type.SE = paste("SE-831 | r =", round(Glis1_SE.831_Ob, digits = 2))) %>%
+  as.data.frame()
+
+
+## Plotting
+
+
+Glis1_SE_Plot_Ob = ggplot(Glis1Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = Glis1Counts.Ob.rel, aes(x = SampleID, y = countRel,
+                                             linetype = "Glis1 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  geom_point(data = Glis1SE.Ob.831.rel, aes(x = SampleID, y = countRel.SE, group = 1), color = "#0066CC", size = 5, 
+             shape = 15) +
+  geom_smooth(data = Glis1SE.Ob.831.rel, aes(x = SampleID, y = countRel.SE, linetype = "SE-831 | r = 0.95"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 30, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 30, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 30),
+        axis.title.y = element_text(face = "bold", size = 30),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 30, face = "bold"),
+        plot.title = element_text(face = "bold", size = 30, hjust = 0.5)) +
+  scale_linetype_manual(name = "", values = c("solid", "dotted")) +
+  
+  scale_x_discrete(breaks = c("ST2-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 1.5)
+
+print(Glis1_SE_Plot_Ob)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/Figures/Figure6/15032018-Glis1-Ob-SE-Fig6C-biggerFont.pdf", width = 10, height = 10)
+Glis1_SE_Plot_Ob
+dev.off()
+
+## qPCR plot figure 4 ##
+Ahr.qPCR = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/qPCR/03042017-Ahr-qPCR.txt", delim = "\t")
+
+
+Ahr.qPCR.Ad = Ahr.qPCR[1:5,] %>% 
+  mutate(Time = c(1, 3, 5, 9, 15), Ahr = "Ahr") %>%
+  add_row(Ahr = "Ahr", Average = 1, SD = 0, SEM = 0, Time = 0, .before = 1)
+
+Ahr.qPCR.Ad$Time = factor(Ahr.qPCR.Ad$Time)
+Ahr.qPCR.Ob = Ahr.qPCR[6:10,] %>% 
+  mutate(Time = c(1, 3, 5, 9, 15), Ahr = "Ahr") %>%
+  add_row(Ahr = "Ahr", Average = 1, SD = 0, SEM = 0, Time = 0, .before = 1)
+
+Ahr.qPCR.Ob$Time = factor(Ahr.qPCR.Ob$Time)
+
+Ahr.qPCR.Ad.pl = ggplot(data = Ahr.qPCR.Ad, aes(x = Time, y = Average, fill = Ahr, group = 1)) +
+  geom_point(color = "#FF6666", size = 5) +
+  geom_line(data = Ahr.qPCR.Ad, aes(x = Time, y = Average, linetype = Ahr), color = "#FF6666", size = 1.5) +
+  geom_errorbar(aes(ymin = Average - SEM, ymax = Average + SEM), width = 0.2, size = 1.0) +
+  geom_hline(yintercept = 1.0, linetype = "dashed", size = 2.0) +
+  theme_classic() +
+  ylim(0, 1) +
+  labs(x = "Time [Days]", y = "Expression relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 20, face = "bold.italic"),
+        legend.title = element_blank(),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
+  scale_x_discrete(breaks = c("0", "1", "3", "5", "9", "15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) +
+  geom_text(x = 2, y = 0.35, label = "**", color = "black", size = 10) +
+  geom_text(x = 3, y = 0.35, label = "***", color = "black", size = 10) +
+  geom_text(x = 4, y = 0.20, label = "**", color = "black", size = 10) +
+  geom_text(x = 5, y = 0.25, label = "**", color = "black", size = 10) +
+  geom_text(x = 6, y = 0.25, label = "**", color = "black", size = 10)
+
+
+print(Ahr.qPCR.Ad.pl)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/12042017-Ahr-Ab-qPCR-Fig4B.pdf", width = 8, height = 8)
+Ahr.qPCR.Ad.pl
+dev.off()
+
+Ahr.qPCR.Ob.pl = ggplot(data = Ahr.qPCR.Ob, aes(x = Time, y = Average, fill = Ahr, group = 1)) +
+  geom_point(color = "#0066CC", size = 5) +
+  geom_line(data = Ahr.qPCR.Ob, aes(x = Time, y = Average, linetype = Ahr), color = "#0066CC", size = 1.5) +
+  geom_errorbar(aes(ymin = Average - SEM, ymax = Average + SEM), width = 0.2, size = 1.0) +
+  geom_hline(yintercept = 1.0, linetype = "dashed", size = 2.0) +
+  theme_classic() +
+  ylim(0, 1.5) +
+  labs(x = "Time [Days]", y = "Expression relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 20, face = "bold.italic"),
+        legend.title = element_blank(),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
+  scale_x_discrete(breaks = c("0", "1", "3", "5", "9", "15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) +
+  geom_text(x = 4, y = 0.7, label = "*", color = "black", size = 10) +
+  geom_text(x = 5, y = 0.5, label = "*", color = "black", size = 10) +
+  geom_text(x = 6, y = 0.3, label = "*", color = "black", size = 10) +
+  scale_fill_manual(values = c("#0066CC"))
+
+
+print(Ahr.qPCR.Ob.pl)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/12042017-Ahr-Ob-qPCR-Fig4B.pdf", width = 8, height = 8)
+Ahr.qPCR.Ob.pl
+dev.off()
+
+## qPCR plot of Glis1 in adipo for figure 4 ##
+Glis1.qPCR = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/qPCR/02022018-Glis1-qPCR.txt", delim = "\t")
+
+
+Glis1.qPCR.Ad = Glis1.qPCR[1:5,] %>% 
+  mutate(Time = c(1, 3, 5, 9, 15), Glis1 = "Glis1") %>%
+  add_row(Glis1 = "Glis1", Average = 1, SD = 0, SEM = 0, Time = 0, .before = 1)
+
+Glis1.qPCR.Ad$Time = factor(Glis1.qPCR.Ad$Time)
+Glis1.qPCR.Ob = Glis1.qPCR[6:10,] %>% 
+  mutate(Time = c(1, 3, 5, 9, 15), Glis1 = "Glis1") %>%
+  add_row(Glis1 = "Glis1", Average = 1, SD = 0, SEM = 0, Time = 0, .before = 1)
+
+Glis1.qPCR.Ob$Time = factor(Glis1.qPCR.Ob$Time)
+
+Glis1.qPCR.Ad.pl = ggplot(data = Glis1.qPCR.Ad, aes(x = Time, y = Average, fill = Glis1, group = 1)) +
+  geom_point(color = "#FF6666", size = 5) +
+  geom_line(data = Glis1.qPCR.Ad, aes(x = Time, y = Average, linetype = Glis1), color = "#FF6666", size = 1.5) +
+  geom_errorbar(aes(ymin = Average - SEM, ymax = Average + SEM), width = 0.2, size = 1.0) +
+  geom_hline(yintercept = 1.0, linetype = "dashed", size = 2.0) +
+  theme_classic() +
+  ylim(0, 1.0) +
+  labs(x = "Time [Days]", y = "Expression relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 30, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 30, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 30),
+        axis.title.y = element_text(face = "bold", size = 30),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 30, face = "bold.italic"),
+        legend.title = element_blank(),
+        plot.title = element_text(face = "bold", size = 30, hjust = 0.5)) +
+  scale_x_discrete(breaks = c("0", "1", "3", "5", "9", "15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) +
+  geom_text(x = 2, y = 0.50, label = "*", color = "black", size = 20) +
+  geom_text(x = 3, y = 0.35, label = "**", color = "black", size = 20) +
+  geom_text(x = 4, y = 0.60, label = "**", color = "black", size = 20) +
+  geom_text(x = 5, y = 0.30, label = "**", color = "black", size = 20) +
+  geom_text(x = 6, y = 0.25, label = "**", color = "black", size = 20)
+
+
+print(Glis1.qPCR.Ad.pl)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/Figures/Figure6/15032018-Glis1-Ad-qPCR-Fig6C-biggerFont.pdf", width = 10, height = 10)
+Glis1.qPCR.Ad.pl
+dev.off()
+
+Glis1.qPCR.Ob.pl = ggplot(data = Glis1.qPCR.Ob, aes(x = Time, y = Average, fill = Glis1, group = 1)) +
+  geom_point(color = "#0066CC", size = 5) +
+  geom_line(data = Glis1.qPCR.Ob, aes(x = Time, y = Average, linetype = Glis1), color = "#0066CC", size = 1.5) +
+  geom_errorbar(aes(ymin = Average - SEM, ymax = Average + SEM), width = 0.2, size = 1.0) +
+  geom_hline(yintercept = 1.0, linetype = "dashed", size = 2.0) +
+  theme_classic() +
+  ylim(0, 1.0) +
+  labs(x = "Time [Days]", y = "Expression relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 30, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 30, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 30),
+        axis.title.y = element_text(face = "bold", size = 30),
+        legend.position = c(0.8, 0.8), legend.text = element_text(size = 30, face = "bold.italic"),
+        legend.title = element_blank(),
+        plot.title = element_text(face = "bold", size = 30, hjust = 0.5)) +
+  scale_x_discrete(breaks = c("0", "1", "3", "5", "9", "15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) +
+  geom_text(x = 2, y = 0.85, label = "*", color = "black", size = 20) +
+  geom_text(x = 3, y = 0.65, label = "*", color = "black", size = 20) +
+  geom_text(x = 4, y = 0.65, label = "*", color = "black", size = 20) +
+  geom_text(x = 5, y = 0.4, label = "***", color = "black", size = 20) +
+  geom_text(x = 6, y = 0.3, label = "***", color = "black", size = 20) +
+  scale_fill_manual(values = c("#0066CC"))
+
+
+print(Glis1.qPCR.Ob.pl)
+pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/Figures/Figure6/15032018-Glis1-Ob-qPCR-Fig6D-biggerFont.pdf", width = 10, height = 10)
+Glis1.qPCR.Ob.pl
+dev.off()
