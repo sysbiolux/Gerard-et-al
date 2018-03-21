@@ -909,3 +909,209 @@ print(Ob.zp27)
 pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/Figures/Supplementary figures/SuppFig5/16032018-Ob-STEM-Prof27-SuppFig5-biggerFont.pdf", width = 10, height = 10)
 Ob.zp27
 dev.off()
+
+# ## Calculate the corelation between the RNA-Seq and the merged SE ##
+# Matrix for SE in adipo
+metaSE.Count.Cor = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/05042017-SEMapAdipoOsteoMERGEDFinCounts.txt",
+                              delim = "\t")
+metaSE.Count.Ad = metaSE.Count.Cor[,c(1, 2:5, 20:24)]
+colnames(metaSE.Count.Ad) = c("SE_ID", "chr", "start", "end", "strand", "D0", "AD1", "AD3", "AD5", "AD15")
+metaSE.Count.Ad
+
+# Matrix for SE in osteo
+metaSE.Count.Ob = metaSE.Count.Cor[,c(1, 2:5, 20, 25:29)]
+colnames(metaSE.Count.Ob) = c("SE_ID", "chr", "start", "end", "strand", "D0", "OD1", "OD3", "OD5", "OD9", "OD15")
+
+## Calculate the corelation between the RNA-Seq and the merged SE ONLY FOR AHR (AHR-SE_/283/284/285/286) in adipo##
+metaSE.Count.Ad.SE283 = filter(metaSE.Count.Ad, SE_ID == "SE-283")
+metaSE.Count.Ad.SE284 = filter(metaSE.Count.Ad, SE_ID == "SE-284")
+metaSE.Count.Ad.SE285 = filter(metaSE.Count.Ad, SE_ID == "SE-285")
+metaSE.Count.Ad.SE286 = filter(metaSE.Count.Ad, SE_ID == "SE-286")
+
+TC = read.table("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/31032017-TC-NormCountMat.txt", sep = "\t",
+                header = TRUE)
+head(TC, 13)
+
+# Select only Ahr from the timecourse data and remove the day9 (because the IP for Adipo day9 was bad, so not used)
+TC.Ahr.Ad = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000019256") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("A"), -starts_with("A.D9"))
+TC.Ahr.Ad
+
+# Select only Glis1 from the timecourse data and remove the day9 (because the IP for adipo day9 did not work, so not used) in adipo
+TC.Glis1.Ad = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000034762") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("A"), -starts_with("A.D9"))
+TC.Glis1.Ad
+
+# Select only Glis1 from the timecourse data in osteo 
+TC.Glis1.Ob = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000034762") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("O"))
+TC.Glis1.Ob
+
+# Metacount of SE for Glis1 in adipo
+metaSE.Count.Ad.SE831 = filter(metaSE.Count.Ad, SE_ID == "SE-831")
+
+# Metacount of SE for Glis1 in osteo
+metaSE.Count.Ob.SE831 = dplyr::filter(metaSE.Count.Ob, SE_ID == "SE-831")
+
+
+## Take the mean for Ahr for every biological replicate per day
+TC.Ahr.Ad.mean = transmute(TC.Ahr.Ad, ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+                           A.D1.Av = ((A.D1.rep1 + A.D1.rep2 + A.D1.rep3)/3),
+                           A.D3.Av = ((A.D3.rep1 + A.D3.rep2 + A.D3.rep3)/3),
+                           A.D5.Av = ((A.D5.rep1 + A.D5.rep2 + A.D5.rep3)/3),
+                           A.D15.Av = ((A.D15.rep1 + A.D15.rep2 + A.D15.rep3)/3))
+TC.Ahr.Ad.mean
+
+## Take the mean for Glis1 in adipo for every biological replicate per day
+TC.Glis1.Ad.mean = transmute(TC.Glis1.Ad, ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+                             A.D1.Av = ((A.D1.rep1 + A.D1.rep2 + A.D1.rep3)/3),
+                             A.D3.Av = ((A.D3.rep1 + A.D3.rep2 + A.D3.rep3)/3),
+                             A.D5.Av = ((A.D5.rep1 + A.D5.rep2 + A.D5.rep3)/3),
+                             A.D15.Av = ((A.D15.rep1 + A.D15.rep2 + A.D15.rep3)/3))
+TC.Glis1.Ad.mean
+
+## Take the mean for Glis1 in osteo for every biological replicate per day
+TC.Glis1.Ob.mean = dplyr::transmute(TC.Glis1.Ob, ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+                                    O.D1.Av = ((O.D1.rep1 + O.D1.rep2 + O.D1.rep3)/3),
+                                    O.D3.Av = ((O.D3.rep1 + O.D3.rep2 + O.D3.rep3)/3),
+                                    O.D5.Av = ((O.D5.rep1 + O.D5.rep2 + O.D5.rep3)/3),
+                                    O.D9.Av = ((O.D9.rep1 + O.D9.rep2 + O.D9.rep3)/3),
+                                    O.D15.Av = ((O.D15.rep1 + O.D15.rep2 + O.D15.rep3)/3))
+TC.Glis1.Ob.mean
+
+## Calculate the Peason correlation in adipo for SE-831 which target Glis1
+metaSE.Count.Ad.SE831.fin = dplyr::select(metaSE.Count.Ad.SE831, -SE_ID, -chr, -start, -end, -strand)
+
+Glis1_SE.831_Ad = cor(as.numeric(metaSE.Count.Ad.SE831.fin) , as.numeric(TC.Glis1.Ad.mean), method = "pearson")
+save(Glis1_SE.831_Ad, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/02022018-PearsonCor-Glis1-Ad-SE831.RData")
+
+## Calculate the Peason correlation in osteo for SE-831 which target Glis1
+metaSE.Count.Ob.SE831.fin = dplyr::select(metaSE.Count.Ob.SE831, -SE_ID, -chr, -start, -end, -strand)
+
+Glis1_SE.831_Ob = cor(as.numeric(metaSE.Count.Ob.SE831.fin) , as.numeric(TC.Glis1.Ob.mean), method = "pearson")
+save(Glis1_SE.831_Ob, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/02022018-PearsonCor-Glis1-Ob-SE831.RData")
+
+# Select only Ahr from the timecourse data 
+TC.Ahr.Ob = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000019256") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("O"))
+TC.Ahr.Ob
+
+## Take the mean for every biological replicate per day
+TC.Ahr.Ob.mean = transmute(TC.Ahr.Ob, ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+                           O.D1.Av = ((O.D1.rep1 + O.D1.rep2 + O.D1.rep3)/3),
+                           O.D3.Av = ((O.D3.rep1 + O.D3.rep2 + O.D3.rep3)/3),
+                           O.D5.Av = ((O.D5.rep1 + O.D5.rep2 + O.D5.rep3)/3),
+                           O.D9.Av = ((O.D9.rep1 + O.D9.rep2 + O.D9.rep3)/3),
+                           O.D15.Av = ((O.D15.rep1 + O.D15.rep2 + O.D15.rep3)/3))
+TC.Ahr.Ob.mean
+
+## Calculate the Peason correlation for SE-283/284/285/286
+metaSE.Count.Ob.SE283.fin = dplyr::select(metaSE.Count.Ob.SE283, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ob.SE284.fin = dplyr::select(metaSE.Count.Ob.SE284, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ob.SE285.fin = dplyr::select(metaSE.Count.Ob.SE285, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ob.SE286.fin = dplyr::select(metaSE.Count.Ob.SE286, -SE_ID, -chr, -start, -end, -strand)
+
+Ahr_Ob_SE.283 = cor(as.numeric(metaSE.Count.Ob.SE283.fin) , as.numeric(TC.Ahr.Ob.mean), method = "pearson")
+save(Ahr_Ob_SE.283, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE283.RData")
+## Calculate the Peason correlation for SE-283/284/285/286
+metaSE.Count.Ad.SE283.fin = dplyr::select(metaSE.Count.Ad.SE283, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ad.SE284.fin = dplyr::select(metaSE.Count.Ad.SE284, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ad.SE285.fin = dplyr::select(metaSE.Count.Ad.SE285, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ad.SE286.fin = dplyr::select(metaSE.Count.Ad.SE286, -SE_ID, -chr, -start, -end, -strand)
+
+Ahr_SE.283 = cor(as.numeric(metaSE.Count.Ad.SE283.fin) , as.numeric(TC.Ahr.Ad.mean), method = "pearson")
+save(Ahr_SE.283, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE283.RData")
+
+Ahr_SE.284 = cor(as.numeric(metaSE.Count.Ad.SE284.fin) , as.numeric(TC.Ahr.Ad.mean), method = "pearson")
+save(Ahr_SE.284, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE284.RData")
+
+Ahr_SE.285 = cor(as.numeric(metaSE.Count.Ad.SE285.fin) , as.numeric(TC.Ahr.Ad.mean), method = "pearson")
+save(Ahr_SE.285, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE285.RData")
+
+Ahr_SE.286 = cor(as.numeric(metaSE.Count.Ad.SE286.fin) , as.numeric(TC.Ahr.Ad.mean), method = "pearson")
+save(Ahr_SE.286, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-SE286.RData")
+
+## Do the same for the SE closed to Cxcl12-SE-921 ##
+metaSE.Count.Ad.SE921 = filter(metaSE.Count.Ad, SE_ID == "SE-921")
+metaSE.Count.Ad.SE921.fin = dplyr::select(metaSE.Count.Ad.SE921, -SE_ID, -chr, -start, -end, -strand)
+TC.Cxcl12.Ad.mean = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000061353") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("A"), -starts_with("A.D9")) %>%
+  transmute(ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+            A.D1.Av = ((A.D1.rep1 + A.D1.rep2 + A.D1.rep3)/3),
+            A.D3.Av = ((A.D3.rep1 + A.D3.rep2 + A.D3.rep3)/3),
+            A.D5.Av = ((A.D5.rep1 + A.D5.rep2 + A.D5.rep3)/3),
+            A.D15.Av = ((A.D15.rep1 + A.D15.rep2 + A.D15.rep3)/3))
+Cxcl12_SE.921 = cor(as.numeric(metaSE.Count.Ad.SE921.fin) , as.numeric(TC.Cxcl12.Ad.mean), 
+                    method = "pearson")
+save(Cxcl12_SE.921, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/10042017-PearsonCor-Cxcl12-SE921.RData")
+
+## Calculate the corelation between the RNA-Seq and the merged SE ONLY FOR AHR (AHR-SE_/283/284/285/286) in Osteo ##
+metaSE.Count.Ob = metaSE.Count.Cor[,c(1, 2:5, 20, 25:29)]
+colnames(metaSE.Count.Ob) = c("SE_ID", "chr", "start", "end", "strand", "D0", "OD1", "OD3", "OD5", "OD9", "OD15")
+
+metaSE.Count.Ob.SE283 = filter(metaSE.Count.Ob, SE_ID == "SE-283")
+metaSE.Count.Ob.SE284 = filter(metaSE.Count.Ob, SE_ID == "SE-284")
+metaSE.Count.Ob.SE285 = filter(metaSE.Count.Ob, SE_ID == "SE-285")
+metaSE.Count.Ob.SE286 = filter(metaSE.Count.Ob, SE_ID == "SE-286")
+
+# Select only Ahr from the timecourse data and remove the day9 (because the IP for Adipo day9 was bad, so not used)
+TC.Ahr.Ob = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000019256") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("O"))
+TC.Ahr.Ob
+
+## Take the mean for every biological replicate per day
+TC.Ahr.Ob.mean = transmute(TC.Ahr.Ob, ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+                           O.D1.Av = ((O.D1.rep1 + O.D1.rep2 + O.D1.rep3)/3),
+                           O.D3.Av = ((O.D3.rep1 + O.D3.rep2 + O.D3.rep3)/3),
+                           O.D5.Av = ((O.D5.rep1 + O.D5.rep2 + O.D5.rep3)/3),
+                           O.D9.Av = ((O.D9.rep1 + O.D9.rep2 + O.D9.rep3)/3),
+                           O.D15.Av = ((O.D15.rep1 + O.D15.rep2 + O.D15.rep3)/3))
+TC.Ahr.Ob.mean
+
+## Calculate the Peason correlation for SE-283/284/285/286
+metaSE.Count.Ob.SE283.fin = dplyr::select(metaSE.Count.Ob.SE283, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ob.SE284.fin = dplyr::select(metaSE.Count.Ob.SE284, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ob.SE285.fin = dplyr::select(metaSE.Count.Ob.SE285, -SE_ID, -chr, -start, -end, -strand)
+metaSE.Count.Ob.SE286.fin = dplyr::select(metaSE.Count.Ob.SE286, -SE_ID, -chr, -start, -end, -strand)
+
+Ahr_Ob_SE.283 = cor(as.numeric(metaSE.Count.Ob.SE283.fin) , as.numeric(TC.Ahr.Ob.mean), method = "pearson")
+save(Ahr_Ob_SE.283, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE283.RData")
+
+Ahr_Ob_SE.284 = cor(as.numeric(metaSE.Count.Ob.SE284.fin) , as.numeric(TC.Ahr.Ob.mean), method = "pearson")
+save(Ahr_Ob_SE.284, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE284.RData")
+
+Ahr_Ob_SE.285 = cor(as.numeric(metaSE.Count.Ob.SE285.fin) , as.numeric(TC.Ahr.Ob.mean), method = "pearson")
+save(Ahr_Ob_SE.285, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE285.RData")
+
+Ahr_Ob_SE.286 = cor(as.numeric(metaSE.Count.Ob.SE286.fin) , as.numeric(TC.Ahr.Ob.mean), method = "pearson")
+save(Ahr_Ob_SE.286, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/11042017-PearsonCor-Ahr-Ob-SE286.RData")
+
+
+## Do the same for the SE closed to Cxcl12-SE-921 ##
+metaSE.Count.Ob.SE921 = filter(metaSE.Count.Ob, SE_ID == "SE-921")
+metaSE.Count.Ob.SE921.fin = dplyr::select(metaSE.Count.Ob.SE921, -SE_ID, -chr, -start, -end, -strand)
+TC.Cxcl12.Ob.mean = rownames_to_column(TC, var = "ensembl_gene_id") %>%
+  filter(ensembl_gene_id == "ENSMUSG00000061353") %>%
+  as_data_frame() %>%
+  dplyr::select(ensembl_gene_id, starts_with("ST2"), starts_with("O")) %>%
+  transmute(ST2.D0.Av = ((ST2.D0.rep1 + ST2.D0.rep2 + ST2.D0.rep3)/3), 
+            O.D1.Av = ((O.D1.rep1 + O.D1.rep2 + O.D1.rep3)/3),
+            O.D3.Av = ((O.D3.rep1 + O.D3.rep2 + O.D3.rep3)/3),
+            O.D5.Av = ((O.D5.rep1 + O.D5.rep2 + O.D5.rep3)/3),
+            O.D9.Av = ((O.D9.rep1 + O.D9.rep2 + O.D9.rep3)/3),
+            O.D15.Av = ((O.D15.rep1 + O.D15.rep2 + O.D15.rep3)/3))
+Cxcl12_Ob_SE.921 = cor(as.numeric(metaSE.Count.Ob.SE921.fin) , as.numeric(TC.Cxcl12.Ob.mean), 
+                       method = "pearson")
+save(Cxcl12_Ob_SE.921, file = "Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/STEM/10042017-PearsonCor-Cxcl12-SE921.Ob.RData")
