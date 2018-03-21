@@ -972,6 +972,285 @@ pdf("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/Figures/Figure6/15032018-Gli
 Glis1_SE_Plot_Ob
 dev.off()
 
+## Plot the Ahr and Notch (1, 2, 3, 4) expression across TC for adipo adipo and osteo
+
+# Notch3 - Adipo
+Notch3Counts.Ad = Notch3Counts[c(1:18),] ## Select only the count for adipo
+AhrCounts.Ad
+rel = "Msc-D0"
+Notch3Counts.Ad.rel = Notch3Counts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch3 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+AhrCounts.Ad.rel
+
+Notch3_Plot_Ad = ggplot(Notch3Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = Notch3Counts.Ad.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch3 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  # geom_point(data = Notch3Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1), color = "#FF6666", size = 5, shape = 17) +
+  # geom_smooth(data = Notch3Counts.Ad.rel, aes(x = SampleID, y = countRel, linetype = "Notch3 mRNA"), 
+  #             method = "loess", se = FALSE, size = 1.5, color = "#FF6666") +
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 2.5)
+
+print(Notch3_Plot_Ad)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/10052017-Notch3-Ad-SuppFig6.pdf", width = 8, height = 8)
+Notch3_Plot_Ad
+dev.off()
+
+# Plot the individual Notches - Notch1
+Notch1Counts.Ad = Notch1Counts[c(1:18),] ## Select only the count for adipo
+rel = "Msc-D0"
+Notch1Counts.Ad.rel = Notch1Counts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch1 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Notch1_Plot_Ad = ggplot(Notch1Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = Notch1Counts.Ad.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch1 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 2.0)
+
+print(Notch1_Plot_Ad)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/17042017-Notch1-Ad-Fig5.pdf", width = 8, height = 8)
+Notch1_Plot_Ad
+dev.off()
+
+# Plot the individual Notches - Notch2
+Notch2Counts.Ad = Notch2Counts[c(1:18),] ## Select only the count for adipo
+rel = "Msc-D0"
+Notch2Counts.Ad.rel = Notch2Counts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch2 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Notch2_Plot_Ad = ggplot(Notch2Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = Notch2Counts.Ad.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch2 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 3.5)
+
+print(Notch2_Plot_Ad)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/17042017-Notch2-Ad-Fig5.pdf", width = 8, height = 8)
+Notch2_Plot_Ad
+dev.off()
+
+# Plot the individual Notches - Notch4
+Notch4Counts.Ad = Notch4Counts[c(1:18),] ## Select only the count for adipo
+rel = "Msc-D0"
+Notch4Counts.Ad.rel = Notch4Counts.Ad %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch4 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Notch4_Plot_Ad = ggplot(Notch4Counts.Ad.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#FF6666") + 
+  geom_smooth(data = Notch4Counts.Ad.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch4 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#FF6666") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Adipocyte differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "A-D1", "A-D3", "A-D5", "A-D9", "A-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 6)
+
+print(Notch4_Plot_Ad)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/17042017-Notch4-Ad-Fig5.pdf", width = 8, height = 8)
+Notch4_Plot_Ad
+dev.off()
+
+
+# Notch3 - Osteo
+Notch3Counts.Ob = Notch3Counts[c(1:3, 19:33),] ## Select only the count for Osteo
+AhrCounts.Ob
+rel = "Msc-D0"
+Notch3Counts.Ob.rel = Notch3Counts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch3 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+AhrCounts.Ob.rel
+
+Notch3_Plot_Ob = ggplot(Notch3Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = Notch3Counts.Ob.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch3 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  # geom_point(data = Notch3Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1), color = "#0066CC", size = 5, shape = 17) +
+  # geom_smooth(data = Notch3Counts.Ob.rel, aes(x = SampleID, y = countRel, linetype = "Notch3 mRNA"), 
+  #             method = "loess", se = FALSE, size = 1.5, color = "#0066CC") +
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 2.5)
+
+print(Notch3_Plot_Ob)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/10052017-Notch3-Ob-SuppFig6.pdf", width = 8, height = 8)
+Notch3_Plot_Ob
+dev.off()
+
+# Plot the individual Notches - Notch1
+Notch1Counts.Ob = Notch1Counts[c(1:3, 19:33),] ## Select only the count for Osteo
+rel = "Msc-D0"
+Notch1Counts.Ob.rel = Notch1Counts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch1 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Notch1_Plot_Ob = ggplot(Notch1Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = Notch1Counts.Ob.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch1 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 2.0)
+
+print(Notch1_Plot_Ob)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/17042017-Notch1-Ob-Fig5.pdf", width = 8, height = 8)
+Notch1_Plot_Ob
+dev.off()
+
+# Plot the individual Notches - Notch2
+Notch2Counts.Ob = Notch2Counts[c(1:3, 19:33),] ## Select only the count for Osteo
+rel = "Msc-D0"
+Notch2Counts.Ob.rel = Notch2Counts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch2 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Notch2_Plot_Ob = ggplot(Notch2Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = Notch2Counts.Ob.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch2 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 3.5)
+
+print(Notch2_Plot_Ob)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/17042017-Notch2-Ob-Fig5.pdf", width = 8, height = 8)
+Notch2_Plot_Ob
+dev.off()
+
+# Plot the individual Notches - Notch4
+Notch4Counts.Ob = Notch4Counts[c(1:3, 19:33),] ## Select only the count for Osteo
+rel = "Msc-D0"
+Notch4Counts.Ob.rel = Notch4Counts.Ob %>% 
+  mutate(countRel = count/count[SampleID == rel]) %>% 
+  mutate(type = "Notch4 mRNA")  ## Normalize the count to Day0 and adda column specifying that it is mRNA samples
+
+Notch4_Plot_Ob = ggplot(Notch4Counts.Ob.rel, aes(x = SampleID, y = countRel, group = 1)) +
+  geom_point(size = 5, color = "#0066CC") + 
+  geom_smooth(data = Notch4Counts.Ob.rel, aes(x = SampleID, y = countRel,
+                                              linetype = "Notch4 mRNA"), 
+              method = "loess", se = FALSE, size = 1.5, color = "#0066CC") + 
+  labs(x = "Time [Days]", y = "Signal relative to undifferentiated ST2 cells", 
+       title = "Osteoblast differentiation") +
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        axis.text.x = element_text(face = "bold", size = 20, colour = "black"),
+        axis.text.y = element_text(face = "bold", size = 20, colour = "black"),
+        axis.title.x = element_text(face = "bold", size = 20),
+        axis.title.y = element_text(face = "bold", size = 20),
+        legend.position = "right", legend.text = element_text(size = 20, face = "bold"),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.8)) +
+  scale_linetype_manual(name = "", values = c("dotdash")) +
+  
+  scale_x_discrete(breaks = c("Msc-D0", "O-D1", "O-D3", "O-D5", "O-D9", "O-D15"),
+                   labels = c("D0", "D1", "D3", "D5", "D9", "D15")) + 
+  ylim(0, 6)
+
+print(Notch4_Plot_Ob)
+pdf("//atlas/FSTC_SYSBIO/Deborah.GERARD/Gerard et al. - Manuscript 1/17042017-Notch4-Ob-Fig5.pdf", width = 8, height = 8)
+Notch4_Plot_Ob
+dev.off()
+
 ## qPCR plot figure 4 ##
 Ahr.qPCR = read_delim("Y:/Deborah.GERARD/Gerard et al. - Manuscript 1/qPCR/03042017-Ahr-qPCR.txt", delim = "\t")
 
